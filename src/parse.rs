@@ -1,6 +1,6 @@
 use chumsky::error::Simple;
 use chumsky::Parser;
-use chumsky::prelude::{filter, just};
+use chumsky::prelude::{end, filter, just};
 use semver::Version;
 use crate::model::CannonBall;
 
@@ -37,23 +37,28 @@ fn semver_filter() -> impl Parser<char, String, Error=Simple<char>> {
     } )
 }
 
-fn semver() -> impl Parser<char, Version, Error=Simple<char>> {
+pub fn semver() -> impl Parser<char, Version, Error=Simple<char>> {
    semver_filter().try_map(|version, span| {
        Version::parse( version.as_str() ).map_err(|e| Simple::custom(span, e.to_string() ))
    })
 }
 
 
-fn cannonball_path() -> impl Parser<char, CannonBall, Error=Simple<char>> {
+pub fn cannonball() -> impl Parser<char, CannonBall, Error=Simple<char>> {
     path_segment().then_ignore(just("/")).then(path_segment()).then_ignore(just("/")).then(semver()).map(|((account,series),version)|{
         CannonBall::new( account, series, version )
     })
 }
 
 
+pub fn cannonball_complete() -> impl Parser<char, CannonBall, Error=Simple<char>> {
+    cannonball().then_ignore(end())
+}
+
+
 #[cfg(test)]
 pub mod test {
-    use crate::parse::{cannonball_path, semver};
+    use crate::parse::{cannonball, semver};
     use chumsky::Parser;
     use semver::Version;
 
@@ -68,7 +73,7 @@ pub mod test {
 
     #[test]
     pub fn test_cannonball() {
-        let cannon_ball = cannonball_path().parse("uberscott/ball/1.3.5").unwrap();
+        let cannon_ball = cannonball().parse("uberscott/ball/1.3.5").unwrap();
         assert_eq!(cannon_ball.version, Version::parse("1.3.5").unwrap());
         assert_eq!(cannon_ball.account.as_str(), "uberscott");
         assert_eq!(cannon_ball.series.as_str(), "ball");

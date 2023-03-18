@@ -7,10 +7,13 @@ pub mod store;
 use std::{fs, io::{Cursor, Read, Seek, Write}, io, path::Path};
 use std::fs::File;
 use std::path::PathBuf;
+use std::str::FromStr;
 use clap::{Args, Parser, Subcommand, ValueEnum};
 use walkdir::{DirEntry, WalkDir};
 use ::zip::write::FileOptions;
 use crate::client::Client;
+use crate::model::CannonBall;
+use crate::parse::cannonball_complete;
 
 #[macro_use]
 extern crate anyhow;
@@ -27,7 +30,8 @@ struct Cli {
 pub enum Command {
   #[command(arg_required_else_help = true)]
   Publish{
-      path: PathBuf
+      path: PathBuf,
+      cannonball: String
   }
 }
 
@@ -38,7 +42,9 @@ pub enum Command {
 async fn main() -> Result<(),anyhow::Error>{
     let args = Cli::parse();
     match args.command {
-        Command::Publish { path } => {
+        Command::Publish { path, cannonball } => {
+            let cannonball = CannonBall::from_str(cannonball.as_str())?;
+println!("CAnnon BALL: {}", cannonball.to_string());
             let client = Client::new()?;
             client.publish(path)?;
         }
