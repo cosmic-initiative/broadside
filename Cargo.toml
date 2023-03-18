@@ -1,7 +1,14 @@
 [package]
-name = "xpack"
+name = "broadside"
 version = "0.1.0"
 edition = "2021"
+
+authors = ["Scott Williams <scott@starlane.io>"]
+description = "The Cosmic Cli provides command line inerface to access a running server enabled with The Cosmic Initiative framework http://thecosmicinitiative.io"
+repository = "https://github.com/cosmic-initiative/broadside"
+license = "MIT"
+
+
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

@@ -8,13 +8,10 @@ use walkdir::{DirEntry, WalkDir};
 use zip::write::FileOptions;
 
 #[macro_use]
-extern crate tokio;
-
-#[macro_use]
 extern crate anyhow;
 
 #[derive(Debug, Parser)] // requires `derive` feature
-#[command(name = "packx")]
+#[command(name = "xpack")]
 #[command(about = "CLI for packing and publishing", long_about = None)]
 struct Cli {
     #[command(subcommand)]
