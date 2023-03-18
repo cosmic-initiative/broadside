@@ -44,9 +44,8 @@ async fn main() -> Result<(),anyhow::Error>{
     match args.command {
         Command::Publish { path, cannonball } => {
             let cannonball = CannonBall::from_str(cannonball.as_str())?;
-println!("CAnnon BALL: {}", cannonball.to_string());
-            let client = Client::new()?;
-            client.publish(path)?;
+            let mut client = Client::new()?;
+            client.publish(path, cannonball )?;
         }
     }
 

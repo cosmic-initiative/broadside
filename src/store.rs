@@ -1,31 +1,43 @@
 use std::fs;
+use std::io::Write;
+use std::os::unix::prelude::OpenOptionsExt;
 use std::path::PathBuf;
+use acid_store::repo::key::KeyRepo;
+use acid_store::repo::{OpenMode, OpenOptions};
+use acid_store::store::DirectoryConfig;
+use crate::model::CannonBall;
 
 pub struct Store {
-
+   repo: KeyRepo<String>
 }
 
 impl Store {
 
-    pub fn repo(&self) -> Result<PathBuf,anyhow::Error> {
-
+    fn repo_dir() -> Result<PathBuf,anyhow::Error> {
         let mut path = PathBuf::new();
         path.push( format!("{}/.broadside",dirs::home_dir().ok_or(anyhow!("cannot determine home_dir"))?.to_str().ok_or(anyhow!("cannot convert homedir to_str"))?));
         Ok(path)
     }
 
-    pub fn account_dir(&self) -> Result<PathBuf,anyhow::Error> {
-        let mut path = self.repo()?;
+    fn account_dir() -> Result<PathBuf,anyhow::Error> {
+        let mut path = Self::repo_dir()?;
         path.push("accounts");
         Ok(path)
     }
 
-    pub fn new() -> Self {
-        Store{}
+    pub fn new() -> Result<Self,anyhow::Error> {
+        let config = DirectoryConfig {
+            path: Self::account_dir()?
+        };
+        let mut repo = OpenOptions::new().mode(OpenMode::Create).open(&config)?;
+        Ok(Store{repo})
     }
 
-    pub fn init(&self) -> Result<(),anyhow::Error> {
-        fs::create_dir_all(self.account_dir()?)?;
+
+    pub fn save( & mut self, cannonball: CannonBall, data: Vec<u8>) -> Result<(),anyhow::Error> {
+        let mut object = self.repo.insert(cannonball.to_string());
+        object.write(data.as_slice())?;
+        object.commit()?;
         Ok(())
     }
 

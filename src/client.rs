@@ -2,6 +2,7 @@ use std::fs;
 use std::io::Cursor;
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
+use crate::model::CannonBall;
 use crate::store::Store;
 use crate::zip::zip_dir;
 
@@ -12,13 +13,12 @@ pub struct Client {
 impl Client {
 
     pub fn new() -> Result<Self, anyhow::Error> {
-        let store = Store::new();
-        store.init()?;
+        let store = Store::new()?;
         Ok(Client{store})
     }
 
 
-    pub fn publish( &self, path: PathBuf) -> Result<(), anyhow::Error>
+    pub fn publish( &mut self, path: PathBuf, cannonball: CannonBall) -> Result<(), anyhow::Error>
     {
 
         println!("Publishing Dir: {}", path.to_str().unwrap());
@@ -48,6 +48,7 @@ impl Client {
             std::fs::read(&path)?
         };
         println!("content: {}", content.len());
+        self.store.save(cannonball,content);
         Ok(())
     }
 }
