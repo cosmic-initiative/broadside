@@ -1,8 +1,8 @@
-pub mod store;
 pub mod client;
 pub mod zip;
 pub mod parse;
-mod model;
+pub mod model;
+pub mod store;
 
 use std::{fs, io::{Cursor, Read, Seek, Write}, io, path::Path};
 use std::fs::File;
@@ -39,7 +39,7 @@ async fn main() -> Result<(),anyhow::Error>{
     let args = Cli::parse();
     match args.command {
         Command::Publish { path } => {
-            let client = Client::new();
+            let client = Client::new()?;
             client.publish(path)?;
         }
     }

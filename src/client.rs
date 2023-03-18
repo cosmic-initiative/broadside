@@ -2,41 +2,24 @@ use std::fs;
 use std::io::Cursor;
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
+use crate::store::Store;
 use crate::zip::zip_dir;
 
 pub struct Client {
-
+  store: Store
 }
 
 impl Client {
 
-    pub fn new() -> Self {
-        Client{}
-    }
-
-    pub fn repo(&self) -> Result<PathBuf,anyhow::Error> {
-
-        let mut path = PathBuf::new();
-        path.push( format!("{}/.broadside",dirs::home_dir().ok_or(anyhow!("cannot determine home_dir"))?.to_str().ok_or(anyhow!("cannot convert homedir to_str"))?));
-        Ok(path)
-    }
-
-    pub fn account_dir(&self) -> Result<PathBuf,anyhow::Error> {
-        let mut path = self.repo()?;
-
-        path.push("accounts");
-
-        Ok(path)
+    pub fn new() -> Result<Self, anyhow::Error> {
+        let store = Store::new();
+        store.init()?;
+        Ok(Client{store})
     }
 
 
     pub fn publish( &self, path: PathBuf) -> Result<(), anyhow::Error>
     {
-
-        fs::create_dir_all(self.account_dir()?)?;
-
-
-        println!( "$HOME {}", dirs::home_dir().unwrap().to_str().unwrap());
 
         println!("Publishing Dir: {}", path.to_str().unwrap());
 

@@ -67,7 +67,7 @@ pub mod test {
     }
 
     #[test]
-    pub fn test_cannonbal_path() {
+    pub fn test_cannonball() {
         let cannon_ball = cannonball_path().parse("uberscott/ball/1.3.5").unwrap();
         assert_eq!(cannon_ball.version, Version::parse("1.3.5").unwrap());
         assert_eq!(cannon_ball.account.as_str(), "uberscott");

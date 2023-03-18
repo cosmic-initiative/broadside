@@ -1,5 +1,6 @@
 mod client;
 mod zip;
+mod store;
 
 
 #[macro_use]
