@@ -8,6 +8,13 @@ description = "The Cosmic Cli provides command line inerface to access a running
 repository = "https://github.com/cosmic-initiative/broadside"
 license = "MIT"
 
+[[bin]]
+name="broadside"
+src="src/main.rs"
+
+[lib]
+name="broadside"
+src="src/lib.rs"
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -19,3 +26,4 @@ dirs= "4.0.0"
 zip = "0.6.4"
 walkdir = "2.3.3"
 anyhow = "1.0.69"
+acid-store = "0.13.0"
