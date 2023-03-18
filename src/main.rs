@@ -1,6 +1,8 @@
 pub mod store;
 pub mod client;
 pub mod zip;
+pub mod parse;
+mod model;
 
 use std::{fs, io::{Cursor, Read, Seek, Write}, io, path::Path};
 use std::fs::File;
