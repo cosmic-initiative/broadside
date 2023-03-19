@@ -48,7 +48,7 @@ impl Client {
             std::fs::read(&path)?
         };
         println!("content: {}", content.len());
-        self.store.save(cannonball,content);
+        self.store.save(&cannonball,content);
         Ok(())
     }
 }
