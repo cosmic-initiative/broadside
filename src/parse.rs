@@ -90,7 +90,7 @@ pub fn report_parse<'a>(errs: Vec<Simple<char>>) -> Report<'a> {
 }
 #[cfg(test)]
 pub mod test {
-    use crate::parse::{cannonball, semver};
+    use crate::parse::{cannonball, cannonfile_complete, semver};
     use chumsky::Parser;
     use semver::Version;
 
@@ -109,5 +109,16 @@ pub mod test {
         assert_eq!(cannon_ball.version, Version::parse("1.3.5").unwrap());
         assert_eq!(cannon_ball.account.as_str(), "uberscott");
         assert_eq!(cannon_ball.series.as_str(), "ball");
+    }
+
+
+
+    #[test]
+    pub fn test_cannonfile() {
+        let file = cannonfile_complete().parse("uberscott/ball/1.3.5/something.txt").unwrap();
+        assert_eq!(file.ball.version, Version::parse("1.3.5").unwrap());
+        assert_eq!(file.ball.account.as_str(), "uberscott");
+        assert_eq!(file.ball.series.as_str(), "ball");
+        assert_eq!(file.path.as_os_str().to_str().unwrap(), "/something.txt");
     }
 }

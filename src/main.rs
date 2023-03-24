@@ -20,6 +20,7 @@ use std::{
     io::{Cursor, Read, Seek, Write},
     path::Path,
 };
+use std::io::stdout;
 use walkdir::{DirEntry, WalkDir};
 use crate::cache::Cache;
 use crate::dirs::cache_dir;
@@ -40,7 +41,7 @@ pub enum Command {
     #[command(arg_required_else_help = true)]
     Publish { path: PathBuf, cannonball: String },
     #[command(arg_required_else_help = true)]
-    Get { path: PathBuf },
+    Cat { path: PathBuf },
     Clear
 }
 
@@ -53,10 +54,12 @@ async fn main() -> Result<(), anyhow::Error> {
             let mut client = Client::new()?;
             client.publish(path, cannonball)?;
         }
-        Command::Get { path } => {
+        Command::Cat { path } => {
             let file = CannonFile::from_str(path.to_str().unwrap())?;
             let cache = Cache::new()?;
-            cache.get(&file)?;
+            let content = cache.get(&file)?;
+            let mut handle= stdout().lock();
+            handle.write_all(content.as_slice())?;
         }
         Command::Clear  => {
             fs::remove_dir_all( crate::dirs::cache_dir()? )?;

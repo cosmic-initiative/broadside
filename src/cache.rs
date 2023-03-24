@@ -24,12 +24,10 @@ impl Cache {
         let mut ball_dir = cache_dir;
         ball_dir.push(ball.to_string());
         if !ball_dir.exists() {
-println!("unzip dir: {}", ball_dir.to_str().unwrap());
             fs::create_dir_all(&ball_dir)?;
             let zip = self.store.fetch( &ball )?;
             let mut zip_path = ball_dir.clone();
             zip_path.push("zip");
-println!("zip_path: {}", zip_path.to_str().unwrap());
             fs::write(zip_path.clone(), zip )?;
             let zip_file = fs::File::open(zip_path)?;
             let mut archive = ZipArchive::new(zip_file)?;
@@ -40,20 +38,18 @@ println!("zip_path: {}", zip_path.to_str().unwrap());
                     let mut path = ball_dir.clone();
                     path.push("files");
                     path.push( file.name() );
-println!("create dir: {}", path.to_str().unwrap());
 
                     fs::create_dir_all(path)?;
                 } else {
                     let mut path = ball_dir.clone();
                     path.push("files");
                     path.push( file.name() );
-println!("create file: {}", path.to_str().unwrap());
-                    let mut out = fs::File::open(path)?;
+                    fs::create_dir_all(path.parent().unwrap())?;
+                    let mut out = fs::File::create(path)?;
                     io::copy(&mut file, &mut out).unwrap();
                 }
             }
         } else {
-            println!("dir exists");
         }
 
         Ok(())
@@ -64,8 +60,12 @@ println!("create file: {}", path.to_str().unwrap());
 
         self.fetch(&cannon_file.ball)?;
 
-//        Ok(fs::read(/file_path)?)
-        unimplemented!()
+        let mut path = cache_dir()?;
+        path.push(cannon_file.ball.to_string());
+        path.push("files");
+        path.push(cannon_file.path.to_str().unwrap().strip_prefix("/").ok_or(anyhow!("path missing absolute prefix /"))? );
+
+        Ok(fs::read(path)?)
     }
 
 }
