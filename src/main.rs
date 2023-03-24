@@ -5,9 +5,10 @@ pub mod parse;
 pub mod source;
 pub mod store;
 pub mod zip;
+pub mod cache;
 
 use crate::client::Client;
-use crate::model::CannonBall;
+use crate::model::{CannonBall, CannonFile};
 use crate::parse::cannonball_complete;
 use ::zip::write::FileOptions;
 use clap::{Args, Parser, Subcommand, ValueEnum};
@@ -20,6 +21,8 @@ use std::{
     path::Path,
 };
 use walkdir::{DirEntry, WalkDir};
+use crate::cache::Cache;
+use crate::dirs::cache_dir;
 
 #[macro_use]
 extern crate anyhow;
@@ -38,6 +41,7 @@ pub enum Command {
     Publish { path: PathBuf, cannonball: String },
     #[command(arg_required_else_help = true)]
     Get { path: PathBuf },
+    Clear
 }
 
 #[tokio::main]
@@ -50,7 +54,12 @@ async fn main() -> Result<(), anyhow::Error> {
             client.publish(path, cannonball)?;
         }
         Command::Get { path } => {
-            
+            let file = CannonFile::from_str(path.to_str().unwrap())?;
+            let cache = Cache::new()?;
+            cache.get(&file)?;
+        }
+        Command::Clear  => {
+            fs::remove_dir_all( crate::dirs::cache_dir()? )?;
         }
     }
 

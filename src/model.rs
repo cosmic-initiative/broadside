@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use std::str::FromStr;
 use semver::Version;
-use crate::parse::cannonball_complete;
+use crate::parse::{cannon_file, cannonball_complete, cannonfile_complete, report_parse};
 use chumsky::Parser;
 
 
@@ -57,13 +57,22 @@ impl CannonFile {
     }
 }
 
+impl FromStr for CannonFile {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        cannonfile_complete().parse(s).map_err(|e| {
+            report_parse(e).print(ariadne::Source::from(s));
+            anyhow!("invalid cannonball file address")
+        })
+    }
+}
 
 impl ToString for CannonFile {
     fn to_string(&self) -> String {
         let mut rtn = String::new();
-        rtn.push_str(self.ball.as_str());
-        rtn.push('/');
-        rtn.push_str(self.path.as_str().unwrap());
+        rtn.push_str(self.ball.to_string().as_str());
+        rtn.push_str(self.path.as_os_str().to_str().unwrap());
         rtn
     }
 }

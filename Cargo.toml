@@ -29,3 +29,4 @@ anyhow = "1.0.69"
 acid-store = { version="0.13.0", features=["store-directory"] }
 chumsky = "0.9.2"
 semver = "1.0.17"
+ariadne = { version = "0.2.0", features = ["auto-color"] }
